@@ -1,2 +1,2 @@
-# Basic-Data-Structures-C
-C Implementation of Some Basic Data Structures
+# Basic-Data-Structures
+Implementation of Some Basic Data Structures in different languages
