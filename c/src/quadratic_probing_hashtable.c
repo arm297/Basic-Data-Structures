@@ -56,13 +56,13 @@ void hashtable_delete(hashtable_t * table){
     free(table);
 }
 
-unsigned int hash(unsigned int a){
-    a = (a ^ 61) ^ (a >> 16);
-    a = a + (a << 3);
-    a = a ^ (a >> 4);
-    a = a * 0x27d4eb2d;
-    a = a ^ (a >> 15);
-    return a;
+// Credits given to Stack Overflow
+// link: https://stackoverflow.com/questions/664014/what-integer-hash-function-are-good-that-accepts-an-integer-hash-key
+unsigned int hash(unsigned int x){
+     x = ((x >> 16) ^ x) * 0x45d9f3b;
+     x = ((x >> 16) ^ x) * 0x45d9f3b;
+     x = (x >> 16) ^ x;
+     return x;
 }
 
 int hashtable_get(hashtable_t * table, int key){
