@@ -4,8 +4,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct hash_table hashtable_t;
-
 int hashtable_get_size(hashtable_t* table) {
     return table->size;
 }
@@ -28,9 +26,9 @@ hashtable_t * hashtable_create() {
 }
 
 void hashtable_delete(hashtable_t * table) {
-    for (int i = 0; i < table->size; ++i){
-        if (*(table->array + i)){
-            free(*(table->array + i));
+    for (int i = 0; i < table->size; ++i) {
+        if (table->array[i]) {
+            free(table->array[i]);
         }
     }
     table->size = 0;
@@ -53,7 +51,7 @@ int hashtable_get(hashtable_t * table, int key) {
     int hash_val = hash((unsigned int) key) % table->size;
     for (int i = 0; i <= table->size; ++i) {
         int hashed_index = (hash_val + i*i) % table->size;
-        struct bucket * indexed_bucket = *(table->array + hashed_index);
+        struct bucket * indexed_bucket = table->array[hashed_index];
         if (indexed_bucket && indexed_bucket->valid 
                 && indexed_bucket->key == key) {
             return indexed_bucket->value;
@@ -66,7 +64,7 @@ void hashtable_remove(hashtable_t * table, int key) {
     int hash_val = hash((unsigned int) key) % table->size;
     for (int i = 0; i <= table->size; ++i) {
         int hashed_index = (hash_val + i*i) % table->size;
-        struct bucket * indexed_bucket = *(table->array + hashed_index);
+        struct bucket* indexed_bucket = table->array[hashed_index];
         if (indexed_bucket && indexed_bucket->valid
                 && indexed_bucket->key == key) {
             indexed_bucket->valid = 0;
@@ -81,7 +79,7 @@ int quadratic_probe(hashtable_t * table, int key) {
     int hash_val = hash((unsigned int) key) % table->size;
     for (int i = 0; i <= table->size; ++i) {
         int hashed_index = (hash_val + i*i) % table->size;
-        struct bucket * indexed_bucket = *(table->array + hashed_index);
+        struct bucket* indexed_bucket = table->array[hashed_index];
         if (!indexed_bucket || !indexed_bucket->valid
             || indexed_bucket->key == key) {
             return hashed_index;
@@ -97,7 +95,7 @@ void resize(hashtable_t * table) {
                                             sizeof(struct bucket*));
     table->size *= 2;
     for (int i = 0; i < old_size; ++i) {
-        struct bucket * indexed_bucket = *(old_array + i);
+        struct bucket * indexed_bucket = old_array[i];
         if (indexed_bucket) {
             if (indexed_bucket ->valid) {
                 int new_index = quadratic_probe(table, indexed_bucket->key);
@@ -114,7 +112,7 @@ void resize(hashtable_t * table) {
 
 void hashtable_put(hashtable_t * table, int key, int value) {
     int probed_index = quadratic_probe(table, key);
-    struct bucket* probed_bucket = *(table->array + probed_index);
+    struct bucket* probed_bucket = table->array[probed_index];
     if (probed_bucket) {
         probed_bucket->key = key;
         probed_bucket->value = value;
@@ -128,10 +126,10 @@ void hashtable_put(hashtable_t * table, int key, int value) {
         new_bucket->key = key;
         new_bucket->value = value;
         new_bucket->valid = 1;
-        *(table->array + probed_index) = new_bucket;
+        table->array[probed_index] = new_bucket;
         table->num_elements++;
     }
-    if (((float)table->num_elements / table->size) >= 0.5){
+    if (((float)table->num_elements / table->size) >= 0.5) {
         resize(table);
     }
     else{
