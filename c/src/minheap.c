@@ -4,66 +4,63 @@
 #include <stdio.h>
 #include <string.h>
 
-struct min_heap{
+typedef struct min_heap {
     int num_elements;
     int array_size;
     int * array;
-};
+} minheap_t;
 
-typedef struct min_heap minheap_t;
-
-int size(minheap_t * heap) {
+int size(minheap_t* heap) {
     return heap->num_elements;
 }
 
-int is_empty(minheap_t * heap) {
+int is_empty(minheap_t* heap) {
     return heap->num_elements == 0;
 }
 
-int peek(minheap_t * heap) {
+int peek(minheap_t* heap) {
     if (is_empty(heap)){
         exit(EXIT_FAILURE);    
     }
-    return *(heap->array);
+    return heap->array[0];
 }
 
-minheap_t * create_heap(){
-    minheap_t * heap = (minheap_t *) malloc(sizeof(minheap_t));
-    heap->array = (int *) malloc(sizeof(int));
+minheap_t* create_heap(){
+    minheap_t* heap = (minheap_t*) malloc(sizeof(minheap_t));
+    heap->array = (int*) malloc(sizeof(int));
     heap->num_elements = 0;
     heap->array_size = 1;
     return heap;
 }
 
-void delete_heap(minheap_t * heap) {
+void delete_heap(minheap_t* heap) {
     free(heap->array);
     free(heap);
 }
 
-void bubble_up(minheap_t * heap, int index) {
+void bubble_up(minheap_t* heap, int index) {
     if (index >= heap->num_elements) {
         exit(EXIT_FAILURE);
     }
     int parent = (index - 1) / 2;
-    while (index != 0 && 
-              *(heap->array + index) < *(heap->array + parent)) {
-        int t = *(heap->array + index);
-        *(heap->array + index) = *(heap->array + parent);
-        *(heap->array + parent) = t;
+    while (index != 0 && heap->array[index] < heap->array[parent]) {
+        int t = heap->array[index];
+        heap->array[index] = heap->array[parent];
+        heap->array[parent] = t;
         index = parent;
         parent = (index - 1) / 2;
     }
 }
 
-void insert(minheap_t * heap, int element) {
+void insert(minheap_t* heap, int element) {
     if (heap->num_elements + 1 > heap->array_size) {
-        int * old_array = heap->array;
-        heap->array = (int *) malloc(2 * heap->array_size * sizeof(int));
+        int* old_array = heap->array;
+        heap->array = (int*) malloc(2 * heap->array_size * sizeof(int));
         memcpy(heap->array, old_array, heap->num_elements * sizeof(int));       
         heap->array_size *= 2;
         free(old_array); 
     }
-    *(heap->array + heap->num_elements) = element;
+    heap->array[heap->num_elements] = element;
     heap->num_elements++;
     bubble_up(heap, heap->num_elements-1);    
 }
@@ -77,16 +74,16 @@ void bubble_down(minheap_t * heap, int index) {
         int child2 = 2 * index + 2; 
         int min_child;
         if (child2 < heap->num_elements) {
-            min_child = (*(heap->array + child1) < *(heap->array + child2)) ? 
-                child1 : child2;
+            min_child = (heap->array[child1] < heap->array[child2]) 
+                ? child1 : child2;
         }
         else {
             min_child = child1;
         }
-        if (*(heap->array + index) > *(heap->array + min_child)) {
-            int t = *(heap->array + index);
-            *(heap->array + index) = *(heap->array + min_child);
-            *(heap->array + min_child) = t;
+        if (heap->array[index] > heap->array[min_child]) {
+            int t = heap->array[index];
+            heap->array[index] = heap->array[min_child];
+            heap->array[min_child] = t;
             index = min_child;
         }
         else {
@@ -97,15 +94,15 @@ void bubble_down(minheap_t * heap, int index) {
 
 int pop(minheap_t * heap) {
     int smallest_element = *(heap->array);
-    *(heap->array) = *(heap->array + heap->num_elements - 1);
+    heap->array[0] = heap->array[heap->num_elements - 1];
     heap->num_elements--;
     bubble_down(heap, 0);
     return smallest_element;
 }
 
 int replace(minheap_t * heap, int element) {
-    int smallest_element = *(heap->array);
-    *(heap->array) = element;
+    int smallest_element = heap->array[0];
+    heap->array[0] = element;
     bubble_down(heap, 0);
     return  smallest_element;
 }

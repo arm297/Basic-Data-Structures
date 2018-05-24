@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#define LEN(l) = sizeof(l)/sizeof(*l)
+
 typedef struct arraylist {
     int n;
     int list_size;
